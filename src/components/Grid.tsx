@@ -2,7 +2,7 @@ import {usePathfinding} from '@/hooks/usePathfinding';
 import Tile from './Tile';
 import React, {forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState} from 'react';
 import {TileType} from "@/types";
-import {bfs} from '@/lib/algorithms';
+import {aStar, bfs, dfs, dijkstra} from '@/lib/pathfinding';
 
 const GRID_SIZE = 20;
 
@@ -12,6 +12,19 @@ const Grid = forwardRef<{ findPath: () => void, resetGrid: () => void }, { algor
 
     const start = useMemo<[number, number]>(() => [0, 0], []);
     const end = useMemo<[number, number]>(() => [GRID_SIZE - 1, GRID_SIZE - 1], []);
+
+    const getAlgorithm = useCallback(() => {
+        switch (algorithm) {
+            case 'dfs':
+                return dfs;
+            case 'dijkstra':
+                return dijkstra;
+            case 'aStar':
+                return aStar;
+            default:
+                return bfs;
+        }
+    }, [algorithm]);
 
     const generateGrid = useCallback(() => {
         let newGrid: TileType[][] = [];
@@ -30,7 +43,8 @@ const Grid = forwardRef<{ findPath: () => void, resetGrid: () => void }, { algor
             newGrid[start[0]][start[1]] = 'start';
             newGrid[end[0]][end[1]] = 'end';
 
-            const {result} = algorithm === 'bfs' ? bfs(newGrid, start, end) : bfs(newGrid, start, end);
+            // Always validate grid with BFS, regardless of selected algorithm
+            const {result} = bfs(newGrid, start, end);
             pathExists = result.length > 0;
 
             attempts++;
@@ -41,17 +55,18 @@ const Grid = forwardRef<{ findPath: () => void, resetGrid: () => void }, { algor
         }
 
         setGrid(newGrid);
-    }, [start, end, algorithm]);
+    }, [start, end]);
 
     useImperativeHandle(ref, () => ({
         findPath: () => {
-            setPath([]);  // Clear path before starting
+            setPath([]);
             setVisitedNodes([]);
-            findPath(grid, start, end);
+            const algorithmFn = getAlgorithm();
+            findPath(grid, start, end, algorithmFn);  // Pass dynamically selected algorithm
         },
         resetGrid: () => {
-            cancelTraversal();  // Stop all current visualizations
-            generateGrid();  // Regenerate grid
+            cancelTraversal();
+            generateGrid();
         }
     }));
 
@@ -85,5 +100,4 @@ const Grid = forwardRef<{ findPath: () => void, resetGrid: () => void }, { algor
 });
 
 Grid.displayName = 'Grid';
-
 export default Grid;

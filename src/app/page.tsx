@@ -8,17 +8,16 @@ export default function Home() {
     const gridRef = useRef<{ findPath: () => void, resetGrid: () => void } | null>(null);
 
     const handleReset = () => {
-        gridRef.current?.resetGrid();  // Reset the grid directly without reloading
+        gridRef.current?.resetGrid();
     };
 
     const handleStart = () => {
-        console.log(`Starting with algorithm: ${algorithm}`);
         gridRef.current?.findPath();
     };
 
     const handleAlgorithmChange = (value: string) => {
         setAlgorithm(value);
-        gridRef.current?.resetGrid();  // Reset the grid and stop traversal
+        gridRef.current?.resetGrid();
     };
 
     return (
