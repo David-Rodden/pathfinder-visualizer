@@ -1,30 +1,43 @@
 "use client";
-import {useCallback, useState} from 'react';
+import {useCallback, useRef, useState} from 'react';
 import {bfs} from '@/lib/algorithms';
 
 export const usePathfinding = () => {
     const [path, setPath] = useState<number[][]>([]);
     const [visitedNodes, setVisitedNodes] = useState<number[][]>([]);
+    const traversalCancelled = useRef(false);
+    const timeoutsRef = useRef<NodeJS.Timeout[]>([]);  // Store all timeouts
 
     const visualizePathfinding = (pathNodes: number[][], visited: Set<string>) => {
         let delay = 0;
-        const stepDelay = 40; // delay here for each tile traversed (successfully or not)
+        const stepDelay = 15;
 
-        // Convert visited Set to array for visualization
         const visitedArray = Array.from(visited).map((key) => key.split(',').map(Number));
+        traversalCancelled.current = false;
 
+        // Clear previous timeouts
+        timeoutsRef.current.forEach((timeout) => clearTimeout(timeout));
+        timeoutsRef.current = [];
+
+        // Visualize visited nodes
         visitedArray.forEach((node) => {
-            setTimeout(() => {
-                setVisitedNodes((prev) => [...prev, node]);
+            const timeout = setTimeout(() => {
+                if (!traversalCancelled.current) {
+                    setVisitedNodes((prev) => [...prev, node]);
+                }
             }, delay);
+            timeoutsRef.current.push(timeout);  // Store timeout ID
             delay += stepDelay;
         });
 
-        // Mark the final path in green (if found)
+        // Visualize final path (green)
         if (pathNodes.length) {
-            setTimeout(() => {
-                setPath(pathNodes);
+            const timeout = setTimeout(() => {
+                if (!traversalCancelled.current) {
+                    setPath(pathNodes);
+                }
             }, delay);
+            timeoutsRef.current.push(timeout);  // Store timeout ID
         }
     };
 
@@ -33,5 +46,22 @@ export const usePathfinding = () => {
         visualizePathfinding(result, visited);
     }, []);
 
-    return {path, findPath, visitedNodes};
+    const cancelTraversal = () => {
+        traversalCancelled.current = true;
+        setPath([]);
+        setVisitedNodes([]);
+
+        // Clear pending timeouts
+        timeoutsRef.current.forEach((timeout) => clearTimeout(timeout));
+        timeoutsRef.current = [];
+    };
+
+    return {
+        path,
+        visitedNodes,
+        findPath,
+        cancelTraversal,
+        setPath,
+        setVisitedNodes,
+    };
 };
