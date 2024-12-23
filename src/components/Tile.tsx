@@ -2,10 +2,13 @@
 import React, {useEffect, useState} from 'react';
 
 type TileProps = {
-    state: 'free' | 'blocked' | 'path';
+    state: 'free' | 'blocked' | 'path' | 'start' | 'end';
+    isStart?: boolean;
+    isEnd?: boolean;
+    isPath?: boolean;
 };
 
-const Tile: React.FC<TileProps> = ({state}) => {
+const Tile: React.FC<TileProps> = ({state, isStart, isEnd, isPath}) => {
     const [type, setType] = useState(state);
 
     useEffect(() => {
@@ -14,11 +17,26 @@ const Tile: React.FC<TileProps> = ({state}) => {
 
     return (
         <div
-            className={`w-8 h-8 border ${
-                type === 'blocked' ? 'bg-black' : type === 'path' ? 'bg-blue-500' : 'bg-white'
+            className={`w-8 h-8 border flex items-center justify-center ${
+                type === 'blocked'
+                    ? 'bg-black'
+                    : isPath
+                        ? 'bg-blue-500'
+                        : 'bg-white'
             }`}
             onClick={() => setType(type === 'free' ? 'blocked' : 'free')}
-        />
+        >
+            {isStart && (
+                <span role="img" aria-label="start">
+                    🚩
+                </span>
+            )}
+            {isEnd && (
+                <span role="img" aria-label="end">
+                    🏁
+                </span>
+            )}
+        </div>
     );
 };
 
