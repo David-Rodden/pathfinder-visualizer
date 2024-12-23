@@ -1,27 +1,31 @@
 import React from 'react';
-import {Box, Button, FormControl, InputLabel, MenuItem, Select} from '@mui/material';
+import {Box, Button, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent} from '@mui/material';
 
 const ControlPanel: React.FC<{
     onStart: () => void;
     onReset: () => void;
     setAlgorithm: (value: string) => void;
 }> = ({onStart, onReset, setAlgorithm}) => {
-    const handleAlgorithmChange = (e: any) => {
-        setAlgorithm(e.target.value);
+    const handleAlgorithmChange = (event: SelectChangeEvent<string>) => {
+        setAlgorithm(event.target.value as string);
     };
 
     return (
         <Box className="flex flex-col gap-6 p-6 rounded-lg bg-white shadow-lg w-full">
             <h2 className="text-xl font-semibold text-gray-800">Controls</h2>
 
-            <FormControl fullWidth>
+            {/* FormControl with proper label linking */}
+            <FormControl fullWidth variant="outlined">
                 <InputLabel id="algorithm-label" shrink>
                     Algorithm
                 </InputLabel>
                 <Select
                     labelId="algorithm-label"
+                    id="algorithm-select"
                     defaultValue="bfs"
                     onChange={handleAlgorithmChange}
+                    label="Algorithm"
+                    variant="outlined"
                 >
                     <MenuItem value="bfs">Breadth-First Search (BFS)</MenuItem>
                     <MenuItem value="dfs">Depth-First Search (DFS)</MenuItem>
