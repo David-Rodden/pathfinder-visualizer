@@ -6,8 +6,12 @@ import {aStar, bfs, dfs, dijkstra} from '@/lib/pathfinding';
 
 const GRID_SIZE = 20;
 
-const Grid = forwardRef<{ findPath: () => void, resetGrid: () => void }, { algorithm: string }>(({algorithm}, ref) => {
-    const {path, findPath, visitedNodes, setPath, setVisitedNodes, cancelTraversal} = usePathfinding();
+const Grid = forwardRef<{ findPath: () => void, resetGrid: () => void }, {
+    algorithm: string,
+    setTimer: (t: number) => void,
+    setRunning: (r: boolean) => void
+}>(({algorithm, setTimer, setRunning}, ref) => {
+    const {path, visitedNodes, findPath, cancelTraversal, setPath, setVisitedNodes} = usePathfinding();
     const [grid, setGrid] = useState<TileType[][]>([]);
 
     const start = useMemo<[number, number]>(() => [0, 0], []);
@@ -29,7 +33,6 @@ const Grid = forwardRef<{ findPath: () => void, resetGrid: () => void }, { algor
     const generateGrid = useCallback(() => {
         let newGrid: TileType[][] = [];
         let pathExists = false;
-
         let attempts = 0;
         const MAX_ATTEMPTS = 100;
 
@@ -39,31 +42,38 @@ const Grid = forwardRef<{ findPath: () => void, resetGrid: () => void }, { algor
                     Math.random() < 0.3 ? 'blocked' : 'free'
                 )
             );
-
             newGrid[start[0]][start[1]] = 'start';
             newGrid[end[0]][end[1]] = 'end';
 
-            // Always validate grid with BFS, regardless of selected algorithm
             const {result} = bfs(newGrid, start, end);
             pathExists = result.length > 0;
-
             attempts++;
         }
-
-        if (attempts === MAX_ATTEMPTS) {
-            console.warn("Failed to generate a completable grid within attempt limit.");
-        }
-
         setGrid(newGrid);
-    }, [start, end]);
+        setPath([]);
+        setVisitedNodes([]);
+    }, [start, end, setPath, setVisitedNodes]);
+
+    const handleStart = () => {
+        const algorithmFn = getAlgorithm();
+        setPath([]);
+        setVisitedNodes([]);
+        setTimer(0);
+        setRunning(true);
+
+        const startTime = performance.now();
+        const interval = setInterval(() => {
+            setTimer(performance.now() - startTime);
+        }, 10);
+
+        findPath(grid, start, end, algorithmFn).then(() => {
+            clearInterval(interval);
+            setRunning(false);
+        });
+    };
 
     useImperativeHandle(ref, () => ({
-        findPath: () => {
-            setPath([]);
-            setVisitedNodes([]);
-            const algorithmFn = getAlgorithm();
-            findPath(grid, start, end, algorithmFn);  // Pass dynamically selected algorithm
-        },
+        findPath: handleStart,
         resetGrid: () => {
             cancelTraversal();
             generateGrid();
@@ -75,10 +85,7 @@ const Grid = forwardRef<{ findPath: () => void, resetGrid: () => void }, { algor
     }, [generateGrid]);
 
     return (
-        <div
-            className="grid gap-1 justify-center"
-            style={{gridTemplateColumns: `repeat(${GRID_SIZE}, 2rem)`}}
-        >
+        <div className="grid gap-1 justify-center" style={{gridTemplateColumns: `repeat(${GRID_SIZE}, 2rem)`}}>
             {grid.flatMap((row, x) =>
                 row.map((tile, y) => {
                     const isPath = path.some(([px, py]) => px === x && py === y);

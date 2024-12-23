@@ -38,9 +38,12 @@ export const usePathfinding = () => {
     };
 
     const findPath = useCallback(
-        (grid: string[][], start: [number, number], end: [number, number], algorithmFn = bfs) => {
-            const {result, visited} = algorithmFn(grid, start, end);
-            visualizePathfinding(result, visited);
+        async (grid: string[][], start: [number, number], end: [number, number], algorithmFn = bfs) => {
+            return new Promise<void>((resolve) => {
+                const { result, visited } = algorithmFn(grid, start, end);
+                visualizePathfinding(result, visited);
+                setTimeout(resolve, result.length ? visited.size * 15 : 0);
+            });
         },
         []
     );
