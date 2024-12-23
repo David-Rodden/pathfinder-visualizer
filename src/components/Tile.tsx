@@ -6,9 +6,10 @@ type TileProps = {
     isStart?: boolean;
     isEnd?: boolean;
     isPath?: boolean;
+    isVisited?: boolean;
 };
 
-const Tile: React.FC<TileProps> = ({state, isStart, isEnd, isPath}) => {
+const Tile: React.FC<TileProps> = ({state, isStart, isEnd, isPath, isVisited}) => {
     const [type, setType] = useState(state);
 
     useEffect(() => {
@@ -21,8 +22,10 @@ const Tile: React.FC<TileProps> = ({state, isStart, isEnd, isPath}) => {
                 type === 'blocked'
                     ? 'bg-black'
                     : isPath
-                        ? 'bg-blue-500'
-                        : 'bg-white'
+                        ? 'bg-green-500'
+                        : isVisited
+                            ? 'bg-red-400'
+                            : 'bg-white'
             }`}
             onClick={() => setType(type === 'free' ? 'blocked' : 'free')}
         >

@@ -1,4 +1,4 @@
-export const bfs = (grid: string[][], start: [number, number], end: [number, number]): number[][] => {
+export const bfs = (grid: string[][], start: [number, number], end: [number, number]) => {
     const rows = grid.length;
     const cols = grid[0].length;
     const queue: [number, number, number[][]][] = [[...start, []]];
@@ -9,14 +9,21 @@ export const bfs = (grid: string[][], start: [number, number], end: [number, num
     while (queue.length) {
         const [x, y, currPath] = queue.shift()!;
         const key = `${x},${y}`;
-        if (x === end[0] && y === end[1]) return [...currPath, [x, y]];
+
+        if (x === end[0] && y === end[1]) {
+            return {result: [...currPath, [x, y]], visited};
+        }
+
         if (!isInBounds(x, y) || visited.has(key) || grid[x][y] === 'blocked') continue;
+
         visited.add(key);
         const newPath = [...currPath, [x, y]];
+
         queue.push([x + 1, y, newPath]);
         queue.push([x - 1, y, newPath]);
         queue.push([x, y + 1, newPath]);
         queue.push([x, y - 1, newPath]);
     }
-    return [];
+
+    return {result: [], visited};  // Return empty path but include visited nodes
 };
