@@ -20,14 +20,18 @@ body {
     font-family: 'Poppins', sans-serif;
 }
 
+
+.timer::before {
+    content: '88:88:88'; /* Widest possible timer */
+    visibility: hidden;
+    position: absolute;
+}
+
 .timer-container {
-    margin-top: 1rem;
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-direction: column;
-    width: 100%;
-    position: relative;
+    min-height: 4rem;
 }
 
 .timer {
@@ -37,8 +41,16 @@ body {
     border-radius: 8px;
     border: 2px solid currentColor;
     text-align: center;
-    width: fit-content;
-    min-width: 5rem;
+
+    /* Fixed width to prevent resizing */
+    width: 8rem; /* Adjust to fit longest possible timer value */
+
     margin: 0 auto;
-    transition: all 0.3s ease-in-out;
+    transition: transform 0.1s ease-in-out;
+
+    /* Poppins for aesthetics */
+    font-family: 'Poppins', sans-serif;
+
+    /* Stabilize numeral alignment */
+    font-variant-numeric: tabular-nums;
 }

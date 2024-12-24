@@ -14,5 +14,12 @@ export const metadata = {
 };
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-    return <div className={poppins.className}>{children}</div>;
+    return (
+        <html lang="en">
+            <head>
+                <title></title>
+            </head>
+            <body className={poppins.className}>{children}</body>
+        </html>
+    );
 }

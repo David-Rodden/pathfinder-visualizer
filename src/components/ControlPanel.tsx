@@ -13,6 +13,14 @@ const ControlPanel: React.FC<{
         setAlgorithm(event.target.value as string);
     };
 
+    // Format Timer as ss:SS (seconds and centiseconds)
+    const formatTimer = (milliseconds: number) => {
+        const seconds = Math.floor(milliseconds / 1000);
+        const centiseconds = Math.floor((milliseconds % 1000) / 10); // Two digits for ms
+
+        return `${seconds}:${centiseconds.toString().padStart(2, '0')}`; // e.g., 5:09
+    };
+
     return (
         <Box className="flex flex-col gap-6 p-6 rounded-lg bg-white shadow-lg w-full">
             <h2 className="text-xl font-semibold text-gray-800">Controls</h2>
@@ -46,7 +54,7 @@ const ControlPanel: React.FC<{
                 </Button>
             </Box>
 
-            {/* Timer Display Below Controls */}
+            {/* Timer Display */}
             {running || timer > 0 ? (
                 <motion.div
                     animate={{
@@ -55,8 +63,26 @@ const ControlPanel: React.FC<{
                     }}
                     transition={{ duration: 0.2 }}
                     className="timer mt-6"
+                    style={{
+                        fontFamily: 'Poppins, sans-serif',
+                        letterSpacing: '0.1rem',
+                        fontSize: '2rem',
+                        width: '8rem', // Fixed width for consistency
+                        textAlign: 'center',
+                        overflow: 'hidden',
+                        position: 'relative',
+                    }}
                 >
-                    {`${(timer / 1000).toFixed(2)} s`}
+                    <span
+                        style={{
+                            visibility: 'hidden',
+                            position: 'absolute',
+                            width: '100%',
+                        }}
+                    >
+                        99:99
+                    </span>
+                    {formatTimer(timer)}
                 </motion.div>
             ) : null}
         </Box>
