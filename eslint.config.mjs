@@ -21,7 +21,7 @@ const config = [
             'arrow-body-style': ['error', 'as-needed'],
             'no-else-return': ['error'],
             curly: ['error', 'multi-line'],
-            'max-len': ['error', { code: 120 }],
+            'max-len': ['error', { code: 140 }],
             quotes: ['error', 'single', { avoidEscape: true }],
             'object-shorthand': ['error', 'always'],
             'no-extra-parens': ['error', 'functions'],

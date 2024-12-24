@@ -12,70 +12,51 @@ export const usePathfinding = () => {
     const visualizePathfinding = (pathNodes: number[][], visitedStart: Set<string>, visitedEnd?: Set<string>) => {
         let delay = 0;
         const stepDelay = 15;
-
-        const visitedArrayStart = Array.from(visitedStart).map(key => key.split(',').map(Number));
-        const visitedArrayEnd = visitedEnd ? Array.from(visitedEnd).map(key => key.split(',').map(Number)) : [];
+        const toArray = (set: Set<string>) => Array.from(set).map(k => k.split(',').map(Number));
+        const visitedArrayStart = toArray(visitedStart),
+            visitedArrayEnd = visitedEnd ? toArray(visitedEnd) : [];
 
         traversalCancelled.current = false;
-
-        // Clear previous timeouts
-        timeoutsRef.current.forEach(timeout => clearTimeout(timeout));
+        timeoutsRef.current.forEach(clearTimeout);
         timeoutsRef.current = [];
 
-        // Interleave visualization for start and end nodes
-        const maxLen = Math.max(visitedArrayStart.length, visitedArrayEnd.length);
-        for (let i = 0; i < maxLen; i++) {
-            if (i < visitedArrayStart.length) {
-                const timeout = setTimeout(() => {
-                    if (!traversalCancelled.current) {
-                        setVisitedNodes(prev => [...prev, visitedArrayStart[i]]);
-                    }
-                }, delay);
-                timeoutsRef.current.push(timeout);
-            }
-
-            if (i < visitedArrayEnd.length) {
-                const timeout = setTimeout(() => {
-                    if (!traversalCancelled.current) {
-                        setVisitedNodes(prev => [...prev, visitedArrayEnd[i]]);
-                    }
-                }, delay);
-                timeoutsRef.current.push(timeout);
-            }
-
+        [...Array(Math.max(visitedArrayStart.length, visitedArrayEnd.length))].forEach((_, i) => {
+            [visitedArrayStart[i], visitedArrayEnd[i]].forEach(node => {
+                if (node) {
+                    timeoutsRef.current.push(
+                        setTimeout(() => {
+                            if (!traversalCancelled.current) setVisitedNodes(prev => [...prev, node]);
+                        }, delay),
+                    );
+                }
+            });
             delay += stepDelay;
-        }
+        });
 
-        // Visualize final path
         if (pathNodes.length) {
-            const timeout = setTimeout(() => {
-                if (!traversalCancelled.current) setPath(pathNodes);
-            }, delay);
-            timeoutsRef.current.push(timeout);
+            timeoutsRef.current.push(
+                setTimeout(() => {
+                    if (!traversalCancelled.current) setPath(pathNodes);
+                }, delay),
+            );
         }
     };
 
     const findPath = useCallback(
-        async (grid: string[][], start: [number, number], end: [number, number], algorithmFn = bfs) => {
-            return new Promise<void>(resolve => {
+        (grid: string[][], start: [number, number], end: [number, number], algorithmFn = bfs) =>
+            new Promise<void>(resolve => {
                 const result = algorithmFn(grid, start, end);
+                const {
+                    visitedStart,
+                    visitedEnd,
+                    visited,
+                    result: pathResult,
+                } = result as BidirectionalPathResult & PathResult;
 
-                if ('visitedStart' in result && 'visitedEnd' in result) {
-                    const { visitedStart, visitedEnd, result: pathResult } = result as BidirectionalPathResult;
-
-                    visualizePathfinding(pathResult, visitedStart, visitedEnd);
-
-                    // Fix: Use the larger of visitedStart or visitedEnd
-                    const maxVisited = Math.max(visitedStart.size, visitedEnd.size);
-                    setTimeout(() => resolve(), pathResult.length ? maxVisited * 15 : 0);
-                } else {
-                    const { visited, result: pathResult } = result as PathResult;
-
-                    visualizePathfinding(pathResult, visited);
-                    setTimeout(() => resolve(), pathResult.length ? visited.size * 15 : 0);
-                }
-            });
-        },
+                visualizePathfinding(pathResult, visitedStart ?? visited, visitedEnd);
+                const maxVisited = Math.max(visitedStart?.size || 0, visitedEnd?.size || 0, visited?.size || 0);
+                setTimeout(resolve, pathResult.length ? maxVisited * 15 : 0);
+            }),
         [],
     );
 
@@ -83,16 +64,9 @@ export const usePathfinding = () => {
         traversalCancelled.current = true;
         setPath([]);
         setVisitedNodes([]);
-        timeoutsRef.current.forEach(timeout => clearTimeout(timeout));
+        timeoutsRef.current.forEach(clearTimeout);
         timeoutsRef.current = [];
     };
 
-    return {
-        path,
-        visitedNodes,
-        findPath,
-        cancelTraversal,
-        setPath,
-        setVisitedNodes,
-    };
+    return { path, visitedNodes, findPath, cancelTraversal, setPath, setVisitedNodes };
 };

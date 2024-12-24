@@ -2,6 +2,7 @@
 import Grid from '../components/Grid';
 import ControlPanel from '../components/ControlPanel';
 import React, { useEffect, useRef, useState } from 'react';
+import { AlgorithmType } from '@/types';
 
 interface GridHandle {
     findPath: () => void;
@@ -10,7 +11,7 @@ interface GridHandle {
 }
 
 export default function Home() {
-    const [algorithm, setAlgorithm] = useState('bfs');
+    const [algorithm, setAlgorithm] = useState<AlgorithmType>('bfs');
     const gridRef = useRef<GridHandle | null>(null);
     const [timer, setTimer] = useState(0);
     const [running, setRunning] = useState(false);
@@ -43,11 +44,13 @@ export default function Home() {
     };
 
     const handleAlgorithmChange = (value: string) => {
-        setAlgorithm(value);
-        setTimer(0);
-        setRunning(false);
-        gridRef.current?.resetGrid();
-        if (gridRef.current?.timerInterval) clearInterval(gridRef.current.timerInterval);
+        if (value as AlgorithmType) {
+            setAlgorithm(value as AlgorithmType);
+            setTimer(0);
+            setRunning(false);
+            gridRef.current?.resetGrid();
+            if (gridRef.current?.timerInterval) clearInterval(gridRef.current.timerInterval);
+        } else console.warn(`Invalid algorithm selected: ${value}`);
     };
 
     return (
