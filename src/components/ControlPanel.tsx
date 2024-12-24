@@ -33,6 +33,7 @@ const ControlPanel: React.FC<{
                     <MenuItem value="dfs">Depth-First Search (DFS)</MenuItem>
                     <MenuItem value="dijkstra">Dijkstra</MenuItem>
                     <MenuItem value="aStar">A*</MenuItem>
+                    <MenuItem value="bidirectional">Bidirectional Search</MenuItem>
                 </Select>
             </FormControl>
 

@@ -2,7 +2,7 @@ import {usePathfinding} from '@/hooks/usePathfinding';
 import Tile from './Tile';
 import React, {forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useState} from 'react';
 import {TileType} from "@/types";
-import {aStar, bfs, dfs, dijkstra} from '@/lib/pathfinding';
+import {aStar, bfs, bidirectionalSearch, dfs, dijkstra} from '@/lib/pathfinding';
 
 const GRID_SIZE = 20;
 
@@ -25,6 +25,8 @@ const Grid = forwardRef<{ findPath: () => void, resetGrid: () => void }, {
                 return dijkstra;
             case 'aStar':
                 return aStar;
+            case 'bidirectional':
+                return bidirectionalSearch;
             default:
                 return bfs;
         }

@@ -5,6 +5,11 @@ export interface PathResult {
     visited: Set<string>;
 }
 
+export interface BidirectionalPathResult extends PathResult {
+    visitedStart: Set<string>;
+    visitedEnd: Set<string>;
+}
+
 export const isInBounds = (x: number, y: number, grid: GridType): boolean =>
     x >= 0 && y >= 0 && x < grid.length && y < grid[0].length;
 

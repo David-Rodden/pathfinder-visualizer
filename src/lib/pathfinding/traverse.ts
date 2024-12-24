@@ -1,7 +1,7 @@
 import {GridType, heuristic, isInBounds, PathResult, reconstructPath} from './utils';
 import {PriorityQueue} from './priorityQueue';
 
-type Strategy = 'bfs' | 'dfs' | 'dijkstra' | 'aStar';
+type Strategy = 'bfs' | 'dfs' | 'dijkstra' | 'aStar' | 'bidirectional';
 
 export function traverseGrid(
     grid: GridType,
