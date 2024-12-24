@@ -1,16 +1,16 @@
-import type {Metadata} from 'next';
+import type { Metadata } from 'next';
 import './globals.css';
-import React from "react";
+import React from 'react';
 
 export const metadata: Metadata = {
     title: 'Pathfinding Visualizer',
     description: 'Visualize pathfinding algorithms dynamically.',
 };
 
-export default function Layout({children}: { children: React.ReactNode }) {
+export default function Layout({ children }: { children: React.ReactNode }) {
     return (
         <html lang="en">
-        <body>{children}</body>
+            <body>{children}</body>
         </html>
     );
 }

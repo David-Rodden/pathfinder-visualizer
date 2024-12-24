@@ -1,11 +1,17 @@
-"use client";
+'use client';
 import Grid from '../components/Grid';
 import ControlPanel from '../components/ControlPanel';
-import React, {useRef, useState} from 'react';
+import React, { useRef, useState } from 'react';
+
+interface GridHandle {
+    findPath: () => void;
+    resetGrid: () => void;
+    timerInterval?: NodeJS.Timeout | null; // Add timerInterval here
+}
 
 export default function Home() {
     const [algorithm, setAlgorithm] = useState('bfs');
-    const gridRef = useRef<{ findPath: () => void, resetGrid: () => void } | null>(null);
+    const gridRef = useRef<GridHandle | null>(null); // Update type to use GridHandle
     const [timer, setTimer] = useState(0);
     const [running, setRunning] = useState(false);
 
@@ -23,9 +29,10 @@ export default function Home() {
 
     const handleAlgorithmChange = (value: string) => {
         setAlgorithm(value);
-        setTimer(0);  // Reset timer when changing algorithm
-        setRunning(false);  // Stop showing the running state
+        setTimer(0);
+        setRunning(false);
         gridRef.current?.resetGrid();
+        if (gridRef.current?.timerInterval) clearInterval(gridRef.current.timerInterval);
     };
 
     return (
@@ -33,7 +40,7 @@ export default function Home() {
             <div className="flex items-start gap-8 w-full">
                 <div className="flex-1">
                     <h1 className="text-3xl font-bold mb-6 text-center">Pathfinding Visualizer</h1>
-                    <Grid ref={gridRef} algorithm={algorithm} setTimer={setTimer} setRunning={setRunning}/>
+                    <Grid ref={gridRef} algorithm={algorithm} setTimer={setTimer} setRunning={setRunning} />
                 </div>
 
                 <div className="w-full lg:w-72">

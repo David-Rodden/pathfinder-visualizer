@@ -2,7 +2,7 @@ export class PriorityQueue<T> {
     private data: { item: T; priority: number }[] = [];
 
     enqueue(item: T, priority: number): void {
-        this.data.push({item, priority});
+        this.data.push({ item, priority });
         this.data.sort((a, b) => a.priority - b.priority);
     }
 

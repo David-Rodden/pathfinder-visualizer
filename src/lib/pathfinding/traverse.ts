@@ -1,5 +1,5 @@
-import {GridType, heuristic, isInBounds, PathResult, reconstructPath} from './utils';
-import {PriorityQueue} from './priorityQueue';
+import { GridType, heuristic, isInBounds, PathResult, reconstructPath } from './utils';
+import { PriorityQueue } from './priorityQueue';
 
 type Strategy = 'bfs' | 'dfs' | 'dijkstra' | 'aStar' | 'bidirectional';
 
@@ -7,7 +7,7 @@ export function traverseGrid(
     grid: GridType,
     start: [number, number],
     end: [number, number],
-    strategy: Strategy
+    strategy: Strategy,
 ): PathResult {
     const visited = new Set<string>();
     const cameFrom = new Map<string, [number, number]>();
@@ -24,9 +24,10 @@ export function traverseGrid(
 
     // Initialize PQ if needed:
     if (strategy === 'dijkstra' || strategy === 'aStar') {
-        const initialPriority = (strategy === 'aStar')
-            ? heuristic(start, end) // distance(=0) + heuristic
-            : 0;                   // distance(=0)
+        const initialPriority =
+            strategy === 'aStar'
+                ? heuristic(start, end) // distance(=0) + heuristic
+                : 0; // distance(=0)
         pq.enqueue(start, initialPriority);
         // For BFS/DFS, we do nothing special here
     }
@@ -35,15 +36,17 @@ export function traverseGrid(
     const popNode = (): [number, number] | undefined => {
         if (strategy === 'bfs') return container.shift();
         if (strategy === 'dfs') return container.pop();
-        return pq.dequeue(); // for dijkstra / astar
+        return pq.dequeue(); // for dijkstra / aStar
     };
 
     // Keep looping while there's work in either the array or the priority queue
     while (
-        (strategy === 'bfs' || strategy === 'dfs') ? container.length :
-            (strategy === 'dijkstra' || strategy === 'aStar') ? !pq.isEmpty() :
-                false
-        ) {
+        strategy === 'bfs' || strategy === 'dfs'
+            ? container.length
+            : strategy === 'dijkstra' || strategy === 'aStar'
+              ? !pq.isEmpty()
+              : false
+    ) {
         const current = popNode();
         if (!current) break; // empty structure
 
@@ -53,11 +56,17 @@ export function traverseGrid(
         visited.add(key);
 
         // If we found the goal
-        if (x === end[0] && y === end[1]) return {result: reconstructPath(cameFrom, end), visited};
+        if (x === end[0] && y === end[1]) return { result: reconstructPath(cameFrom, end), visited };
 
         // Expand neighbors
-        for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-            const nx = x + dx, ny = y + dy;
+        for (const [dx, dy] of [
+            [1, 0],
+            [-1, 0],
+            [0, 1],
+            [0, -1],
+        ]) {
+            const nx = x + dx,
+                ny = y + dy;
             if (!isInBounds(nx, ny, grid) || grid[nx][ny] === 'blocked') continue;
 
             const neighborKey = `${nx},${ny}`;
@@ -72,10 +81,12 @@ export function traverseGrid(
             // BFS/DFS => normal container usage
             // Dijkstra => PQ with newDist
             // A* => PQ with newDist + heuristic
-            if (strategy === 'bfs' || strategy === 'dfs') container.push([nx, ny]); else if (strategy === 'dijkstra') pq.enqueue([nx, ny], newDist); else pq.enqueue([nx, ny], newDist + heuristic([nx, ny], end));
+            if (strategy === 'bfs' || strategy === 'dfs') container.push([nx, ny]);
+            else if (strategy === 'dijkstra') pq.enqueue([nx, ny], newDist);
+            else pq.enqueue([nx, ny], newDist + heuristic([nx, ny], end));
         }
     }
 
     // If we exhaust everything without finding the end:
-    return {result: [], visited};
+    return { result: [], visited };
 }

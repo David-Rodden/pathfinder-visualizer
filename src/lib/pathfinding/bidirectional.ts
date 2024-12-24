@@ -1,9 +1,9 @@
-import {BidirectionalPathResult, GridType, isInBounds, reconstructPath} from './utils';
+import { BidirectionalPathResult, GridType, isInBounds, reconstructPath } from './utils';
 
 export const bidirectionalSearch = (
     grid: GridType,
     start: [number, number],
-    end: [number, number]
+    end: [number, number],
 ): BidirectionalPathResult => {
     const visitedStart = new Set<string>();
     const visitedEnd = new Set<string>();
@@ -23,7 +23,7 @@ export const bidirectionalSearch = (
                 return {
                     result: [
                         ...reconstructPath(cameFromStart, [sx, sy]),
-                        ...reconstructPath(cameFromEnd, [sx, sy]).reverse()
+                        ...reconstructPath(cameFromEnd, [sx, sy]).reverse(),
                     ],
                     visited: new Set([...visitedStart, ...visitedEnd]),
                     visitedStart,
@@ -43,7 +43,7 @@ export const bidirectionalSearch = (
                 return {
                     result: [
                         ...reconstructPath(cameFromStart, [ex, ey]),
-                        ...reconstructPath(cameFromEnd, [ex, ey]).reverse()
+                        ...reconstructPath(cameFromEnd, [ex, ey]).reverse(),
                     ],
                     visited: new Set([...visitedStart, ...visitedEnd]),
                     visitedStart,
@@ -54,7 +54,7 @@ export const bidirectionalSearch = (
             expandNode(ex, ey, queueEnd, visitedEnd, cameFromEnd, grid);
         }
     }
-    return {result: [], visited: visitedStart, visitedStart, visitedEnd};
+    return { result: [], visited: visitedStart, visitedStart, visitedEnd };
 };
 
 // Node Expansion
@@ -64,10 +64,16 @@ const expandNode = (
     queue: [number, number][],
     visited: Set<string>,
     cameFrom: Map<string, [number, number]>,
-    grid: GridType
+    grid: GridType,
 ) => {
-    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-        const nx = x + dx, ny = y + dy;
+    for (const [dx, dy] of [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1],
+    ]) {
+        const nx = x + dx,
+            ny = y + dy;
         const key = `${nx},${ny}`;
 
         if (isInBounds(nx, ny, grid) && grid[nx][ny] !== 'blocked' && !visited.has(key)) {

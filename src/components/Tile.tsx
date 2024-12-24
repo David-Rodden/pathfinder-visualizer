@@ -1,5 +1,5 @@
-"use client";
-import React, {useEffect, useState} from 'react';
+'use client';
+import React, { useEffect, useState } from 'react';
 
 type TileProps = {
     state: 'free' | 'blocked' | 'path' | 'start' | 'end';
@@ -9,7 +9,7 @@ type TileProps = {
     isVisited?: boolean;
 };
 
-const Tile: React.FC<TileProps> = ({state, isStart, isEnd, isPath, isVisited}) => {
+const Tile: React.FC<TileProps> = ({ state, isStart, isEnd, isPath, isVisited }) => {
     const [type, setType] = useState(state);
 
     useEffect(() => {
@@ -22,22 +22,22 @@ const Tile: React.FC<TileProps> = ({state, isStart, isEnd, isPath, isVisited}) =
                 type === 'blocked'
                     ? 'bg-black'
                     : isPath
-                        ? 'bg-green-500'
-                        : isVisited
-                            ? 'bg-red-400'
-                            : 'bg-white hover:bg-gray-200'  // Gray hover effect
+                      ? 'bg-green-500'
+                      : isVisited
+                        ? 'bg-red-400'
+                        : 'bg-white hover:bg-gray-200' // Gray hover effect
             }`}
             onClick={() => setType(type === 'free' ? 'blocked' : 'free')}
         >
             {isStart && (
                 <span role="img" aria-label="start">
-                🚩
-            </span>
+                    🚩
+                </span>
             )}
             {isEnd && (
                 <span role="img" aria-label="end">
-                🏁
-            </span>
+                    🏁
+                </span>
             )}
         </div>
     );
