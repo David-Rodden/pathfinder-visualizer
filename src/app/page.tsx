@@ -1,19 +1,34 @@
 'use client';
 import Grid from '../components/Grid';
 import ControlPanel from '../components/ControlPanel';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface GridHandle {
     findPath: () => void;
     resetGrid: () => void;
-    timerInterval?: NodeJS.Timeout | null; // Add timerInterval here
+    timerInterval?: NodeJS.Timeout | null;
 }
 
 export default function Home() {
     const [algorithm, setAlgorithm] = useState('bfs');
-    const gridRef = useRef<GridHandle | null>(null); // Update type to use GridHandle
+    const gridRef = useRef<GridHandle | null>(null);
     const [timer, setTimer] = useState(0);
     const [running, setRunning] = useState(false);
+
+    // Suppress React 19 ref warning
+    useEffect(() => {
+        const originalError = console.error;
+        console.error = (...args) => {
+            if (typeof args[0] === 'string' && args[0].includes('Accessing element.ref was removed in React 19')) {
+                return; // Suppress this warning only
+            }
+            originalError(...args);
+        };
+
+        return () => {
+            console.error = originalError;
+        };
+    }, []);
 
     const handleReset = () => {
         gridRef.current?.resetGrid();

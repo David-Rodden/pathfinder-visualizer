@@ -17,7 +17,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     return (
         <html lang="en">
             <head>
-                <title></title>
+                <title>Pathfinding Visualizer</title>
             </head>
             <body className={poppins.className}>{children}</body>
         </html>

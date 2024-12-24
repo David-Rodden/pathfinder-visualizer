@@ -102,10 +102,23 @@ const Grid = forwardRef<
                 row.map((tile, y) => {
                     const isPath = path.some(([px, py]) => px === x && py === y);
                     const isVisited = visitedNodes.some(([vx, vy]) => vx === x && vy === y);
+
+                    // Dynamically determine tile state based on pathfinding
+                    const dynamicState: TileType =
+                        x === start[0] && y === start[1]
+                            ? 'start'
+                            : x === end[0] && y === end[1]
+                              ? 'end'
+                              : isPath
+                                ? 'path'
+                                : isVisited
+                                  ? 'traversed' // New traversed state for visited tiles
+                                  : tile;
+
                     return (
                         <Tile
                             key={`${x}-${y}`}
-                            state={tile}
+                            state={dynamicState} // Use dynamically determined state
                             isStart={x === start[0] && y === start[1]}
                             isEnd={x === end[0] && y === end[1]}
                             isPath={isPath}
