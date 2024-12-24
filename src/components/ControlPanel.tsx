@@ -1,5 +1,15 @@
-import React from 'react';
-import { Box, Button, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import React, { useState } from 'react';
+import {
+    Box,
+    Button,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select,
+    SelectChangeEvent,
+    Switch,
+    Typography,
+} from '@mui/material';
 import { motion } from 'framer-motion';
 
 const ControlPanel: React.FC<{
@@ -9,16 +19,25 @@ const ControlPanel: React.FC<{
     timer: number;
     running: boolean;
 }> = ({ onStart, onReset, setAlgorithm, timer, running }) => {
-    const handleAlgorithmChange = (event: SelectChangeEvent<string>) => {
-        setAlgorithm(event.target.value as string);
+    const [bidirectional, setBidirectional] = useState(false);
+    const [selectedAlgorithm, setSelectedAlgorithm] = useState<string>('bfs');
+
+    const handleAlgorithmChange = (event: SelectChangeEvent) => {
+        const newAlgorithm = event.target.value as string;
+        setSelectedAlgorithm(newAlgorithm);
+        setAlgorithm(bidirectional ? 'bidirectional' : newAlgorithm);
     };
 
-    // Format Timer as ss:SS (seconds and centiseconds)
+    const toggleBidirectional = () => {
+        const newState = !bidirectional;
+        setBidirectional(newState);
+        setAlgorithm(newState ? 'bidirectional' : selectedAlgorithm);
+    };
+
     const formatTimer = (milliseconds: number) => {
         const seconds = Math.floor(milliseconds / 1000);
-        const centiseconds = Math.floor((milliseconds % 1000) / 10); // Two digits for ms
-
-        return `${seconds}:${centiseconds.toString().padStart(2, '0')}`; // e.g., 5:09
+        const centiseconds = Math.floor((milliseconds % 1000) / 10);
+        return `${seconds}:${centiseconds.toString().padStart(2, '0')}`;
     };
 
     return (
@@ -32,7 +51,7 @@ const ControlPanel: React.FC<{
                 <Select
                     labelId="algorithm-label"
                     id="algorithm-select"
-                    defaultValue="bfs"
+                    value={selectedAlgorithm}
                     onChange={handleAlgorithmChange}
                     label="Algorithm"
                     variant="outlined"
@@ -41,9 +60,16 @@ const ControlPanel: React.FC<{
                     <MenuItem value="dfs">Depth-First Search (DFS)</MenuItem>
                     <MenuItem value="dijkstra">Dijkstra</MenuItem>
                     <MenuItem value="aStar">A*</MenuItem>
-                    <MenuItem value="bidirectional">Bidirectional Search</MenuItem>
                 </Select>
             </FormControl>
+
+            {/* Bidirectional Pathing Section (Side-by-Side) */}
+            <Box className="flex items-center gap-2">
+                <Switch checked={bidirectional} onChange={toggleBidirectional} />
+                <Typography variant="body1" className="text-gray-700">
+                    Bidirectional Pathing
+                </Typography>
+            </Box>
 
             <Box className="flex gap-4 w-full">
                 <Button onClick={onReset} variant="outlined" color="secondary" fullWidth>
@@ -54,7 +80,6 @@ const ControlPanel: React.FC<{
                 </Button>
             </Box>
 
-            {/* Timer Display */}
             {running || timer > 0 ? (
                 <motion.div
                     animate={{
@@ -67,21 +92,10 @@ const ControlPanel: React.FC<{
                         fontFamily: 'Poppins, sans-serif',
                         letterSpacing: '0.1rem',
                         fontSize: '2rem',
-                        width: '8rem', // Fixed width for consistency
+                        width: '8rem',
                         textAlign: 'center',
-                        overflow: 'hidden',
-                        position: 'relative',
                     }}
                 >
-                    <span
-                        style={{
-                            visibility: 'hidden',
-                            position: 'absolute',
-                            width: '100%',
-                        }}
-                    >
-                        99:99
-                    </span>
                     {formatTimer(timer)}
                 </motion.div>
             ) : null}
