@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🚀 Pathfinding Visualizer
 
-## Getting Started
+Welcome to my **Pathfinding Visualizer** – an interactive tool designed to dynamically showcase popular pathfinding
+algorithms in action. This project is ideal for learning and demonstrating how various search algorithms navigate
+through grids to find the shortest path.
 
-First, run the development server:
+## ✨ Features
+
+- 🎯 **Visualize** pathfinding algorithms in real-time.
+- 🔄 **Bidirectional Pathing** – Speed up search by enabling bidirectional search.
+- 🎨 **Responsive UI** – Sleek and intuitive interface using Material-UI and Tailwind CSS.
+- ⏱️ **Timer** – Track how long each algorithm takes to compute the path.
+
+## 📸 Preview
+
+![Pathfinding Visualizer](public/visualizer_preview.png)
+
+---
+
+## ⚙️ Algorithms Included
+
+- 🔵 **Breadth-First Search (BFS)** – Unweighted, guarantees shortest path.
+- 🟢 **Depth-First Search (DFS)** – Unweighted, does not guarantee shortest path.
+- 🟡 **Dijkstra's Algorithm** – Weighted, guarantees shortest path.
+- 🔴 **A*** – Weighted, heuristic-based pathfinding.
+- 🔄 **Bidirectional Versions** – Available for all algorithms to boost performance.
+
+---
+
+## 🚧 How It Works
+
+- **Select** an algorithm from the dropdown.
+- **Enable** the bidirectional switch (optional).
+- **Start Pathfinding** – Visualize the algorithm finding the shortest path.
+- **Reset Grid** to try another algorithm.
+
+---
+
+## 🛠️ Installation
 
 ```bash
+# Clone the repository
+git clone git@github.com:David-Rodden/pathfinder-visualizer.git
+
+# Navigate to the project directory
+cd pathfinding-visualizer
+
+# Install dependencies
+npm install
+
+# Run the development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🎨 Customization
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Want to tweak the visualizer to your liking? Here are a few quick tips:
 
-## Learn More
+- **Grid Size**  
+  Modify the grid size by adjusting the `GRID_SIZE` variable in `Grid.tsx`.
+  ```
+  const GRID_SIZE = 20;  // Change this to resize the grid
+  ```
 
-To learn more about Next.js, take a look at the following resources:
+- **Obstacle Density**  
+  Customize the obstacle generation by tweaking the `Math.random()` threshold in `generateGrid()`.
+  ```
+  const newGrid: TileType[][] = Array.from({ length: GRID_SIZE }, () =>
+      Array.from({ length: GRID_SIZE }, () => (Math.random() < 0.3 ? 'blocked' : 'free')),
+  );
+  ```
+  Lowering the value reduces obstacles, while raising it creates denser grids.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Algorithm Defaults**  
+  Set the default algorithm by modifying the state in `Home.tsx`:
+  ```
+  const [algorithm, setAlgorithm] = useState<AlgorithmType>('bfs');
+  ```
