@@ -2,7 +2,7 @@ import { usePathfinding } from '@/hooks/usePathfinding';
 import Tile from './Tile';
 import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { AlgorithmType, TileType } from '@/types';
-import { aStar, bfs, bidirectionalSearch, dfs, dijkstra } from '@/lib/pathfinding';
+import { AStarSearch, BaseSearch, BfsSearch, DfsSearch, DijkstraSearch } from '@/lib/pathfinding';
 
 const GRID_SIZE = 20;
 
@@ -10,6 +10,7 @@ interface GridProps {
     algorithm: AlgorithmType;
     setTimer: (t: number) => void;
     setRunning: (r: boolean) => void;
+    isBidirectional: boolean;
 }
 
 interface GridHandle {
@@ -18,28 +19,20 @@ interface GridHandle {
     timerInterval?: NodeJS.Timeout | null;
 }
 
-const algorithmMap = {
-    dfs,
-    dijkstra,
-    aStar,
-    bidirectional: bidirectionalSearch,
-    bfs,
-} as const;
+const algorithmMap: Record<Exclude<AlgorithmType, 'bidirectional'>, new (grid: TileType[][]) => BaseSearch> = {
+    bfs: BfsSearch,
+    dfs: DfsSearch,
+    dijkstra: DijkstraSearch,
+    aStar: AStarSearch,
+};
 
-const Grid = forwardRef<GridHandle, GridProps>(({ algorithm, setTimer, setRunning }, ref) => {
+const Grid = forwardRef<GridHandle, GridProps>(({ algorithm, setTimer, setRunning, isBidirectional }, ref) => {
     const { path, visitedNodes, findPath, cancelTraversal, setPath, setVisitedNodes } = usePathfinding();
     const [grid, setGrid] = useState<TileType[][]>([]);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
     const start = useMemo(() => [0, 0] as [number, number], []);
     const end = useMemo(() => [GRID_SIZE - 1, GRID_SIZE - 1] as [number, number], []);
-
-    const getAlgorithm = useCallback(() => {
-        cancelTraversal();
-        setTimer(0);
-        setRunning(false);
-        return algorithmMap[algorithm] ?? bfs;
-    }, [algorithm, cancelTraversal, setTimer, setRunning]);
 
     const generateGrid = useCallback(() => {
         let pathExists = false;
@@ -53,7 +46,9 @@ const Grid = forwardRef<GridHandle, GridProps>(({ algorithm, setTimer, setRunnin
             newGrid[start[0]][start[1]] = 'start';
             newGrid[end[0]][end[1]] = 'end';
 
-            pathExists = bfs(newGrid, start, end).result.length > 0;
+            const bfsSearch = new BfsSearch(newGrid);
+            pathExists = bfsSearch.search(start, end).result.length > 0;
+
             if (pathExists) {
                 setGrid(newGrid);
                 setPath([]);
@@ -63,7 +58,9 @@ const Grid = forwardRef<GridHandle, GridProps>(({ algorithm, setTimer, setRunnin
     }, [start, end, setPath, setVisitedNodes]);
 
     const handleStart = () => {
-        const algorithmFn = getAlgorithm();
+        const AlgorithmClass = algorithmMap[algorithm];
+        const algorithmInstance = new AlgorithmClass(grid);
+
         setPath([]);
         setVisitedNodes([]);
         setTimer(0);
@@ -72,7 +69,8 @@ const Grid = forwardRef<GridHandle, GridProps>(({ algorithm, setTimer, setRunnin
         const startTime = performance.now();
         intervalRef.current = setInterval(() => setTimer(performance.now() - startTime), 10);
 
-        findPath(grid, start, end, algorithmFn).finally(() => {
+        // Pass the bidirectional flag
+        findPath(grid, start, end, algorithmInstance, isBidirectional).finally(() => {
             if (intervalRef.current) {
                 clearInterval(intervalRef.current);
                 intervalRef.current = null;

@@ -1,6 +1,6 @@
 'use client';
 import { useCallback, useRef, useState } from 'react';
-import { bfs } from '@/lib/pathfinding';
+import { BaseSearch } from '@/lib/pathfinding';
 import { BidirectionalPathResult, PathResult } from '@/lib/pathfinding/utils';
 
 export const usePathfinding = () => {
@@ -68,9 +68,15 @@ export const usePathfinding = () => {
      *  Run pathfinding + wait for animations
      */
     const findPath = useCallback(
-        (grid: string[][], start: [number, number], end: [number, number], algorithmFn = bfs) =>
+        (
+            grid: string[][],
+            start: [number, number],
+            end: [number, number],
+            algorithmInstance: BaseSearch,
+            bidirectional = false,
+        ) =>
             new Promise<void>(resolve => {
-                const result = algorithmFn(grid, start, end);
+                const result = algorithmInstance.search(start, end, bidirectional);
                 const {
                     visitedStart,
                     visitedEnd,
@@ -78,7 +84,6 @@ export const usePathfinding = () => {
                     result: pathResult,
                 } = result as BidirectionalPathResult & PathResult;
 
-                // Directly use visualizePathfinding and pass the resolve callback
                 visualizePathfinding(pathResult, visitedStart ?? visited, visitedEnd, resolve);
             }),
         [],

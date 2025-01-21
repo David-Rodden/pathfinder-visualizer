@@ -12,6 +12,7 @@ interface GridHandle {
 
 export default function Home() {
     const [algorithm, setAlgorithm] = useState<AlgorithmType>('bfs');
+    const [isBidirectional, setBidirectional] = useState(false);
     const gridRef = useRef<GridHandle | null>(null);
     const [timer, setTimer] = useState(0);
     const [running, setRunning] = useState(false);
@@ -58,7 +59,13 @@ export default function Home() {
             <div className="flex items-start gap-8 w-full">
                 <div className="flex-1">
                     <h1 className="text-3xl font-bold mb-6 text-center">Pathfinding Visualizer</h1>
-                    <Grid ref={gridRef} algorithm={algorithm} setTimer={setTimer} setRunning={setRunning} />
+                    <Grid
+                        ref={gridRef}
+                        algorithm={algorithm}
+                        setTimer={setTimer}
+                        setRunning={setRunning}
+                        isBidirectional={isBidirectional}
+                    />
                 </div>
 
                 <div className="w-full lg:w-72">
@@ -68,6 +75,7 @@ export default function Home() {
                         setAlgorithm={handleAlgorithmChange}
                         timer={timer}
                         running={running}
+                        setBidirectional={setBidirectional}
                     />
                 </div>
             </div>

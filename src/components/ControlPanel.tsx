@@ -16,22 +16,23 @@ const ControlPanel: React.FC<{
     onStart: () => void;
     onReset: () => void;
     setAlgorithm: (value: string) => void;
+    setBidirectional: (value: boolean) => void;
     timer: number;
     running: boolean;
-}> = ({ onStart, onReset, setAlgorithm, timer, running }) => {
-    const [bidirectional, setBidirectional] = useState(false);
+}> = ({ onStart, onReset, setAlgorithm, setBidirectional, timer, running }) => {
+    const [bidirectional, setLocalBidirectional] = useState(false);
     const [selectedAlgorithm, setSelectedAlgorithm] = useState<string>('bfs');
 
     const handleAlgorithmChange = (event: SelectChangeEvent) => {
         const newAlgorithm = event.target.value as string;
         setSelectedAlgorithm(newAlgorithm);
-        setAlgorithm(bidirectional ? 'bidirectional' : newAlgorithm);
+        setAlgorithm(newAlgorithm);
     };
 
     const toggleBidirectional = () => {
         const newState = !bidirectional;
+        setLocalBidirectional(newState);
         setBidirectional(newState);
-        setAlgorithm(newState ? 'bidirectional' : selectedAlgorithm);
     };
 
     const formatTimer = (milliseconds: number) => {
@@ -63,7 +64,6 @@ const ControlPanel: React.FC<{
                 </Select>
             </FormControl>
 
-            {/* Bidirectional Pathing Section (Side-by-Side) */}
             <Box className="flex items-center gap-2">
                 <Switch checked={bidirectional} onChange={toggleBidirectional} />
                 <Typography variant="body1" className="text-gray-700">

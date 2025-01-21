@@ -1,5 +1,5 @@
-export { bfs } from './pathfinding/bfs';
-export { dfs } from './pathfinding/dfs';
-export { dijkstra } from './pathfinding/dijkstra';
-export { aStar } from './pathfinding/astar';
-export { bidirectionalSearch } from './pathfinding/bidirectional';
+export { BfsSearch } from './pathfinding/BfsSearch';
+export { DfsSearch } from './pathfinding/DfsSearch';
+export { DijkstraSearch } from './pathfinding/DijkstraSearch';
+export { AStarSearch } from './pathfinding/AStarSearch';
+export { BaseSearch } from './pathfinding/BaseSearch';
